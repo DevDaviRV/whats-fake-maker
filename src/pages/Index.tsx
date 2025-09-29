@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChatHeader } from "@/components/ChatHeader";
 import { MessageList } from "@/components/MessageList";
 import { ChatInput } from "@/components/ChatInput";
 import { EditorPanel } from "@/components/EditorPanel";
 import { Conversation } from "@/types/chat";
+import { useVideoExport } from "@/hooks/useVideoExport";
+import { ExportFormat } from "@/components/ExportDialog";
 import { toast } from "sonner";
 
 const initialConversation: Conversation = {
@@ -38,6 +40,8 @@ const Index = () => {
   const [conversation, setConversation] = useState<Conversation>(initialConversation);
   const [isPlaying, setIsPlaying] = useState(false);
   const [displayedMessages, setDisplayedMessages] = useState(conversation.messages);
+  const chatPreviewRef = useRef<HTMLDivElement>(null);
+  const { exportVideo, isExporting } = useVideoExport();
 
   const handlePlay = () => {
     if (isPlaying) {
@@ -68,10 +72,54 @@ const Index = () => {
     }
   };
 
+  const handleExportVideo = async () => {
+    if (!chatPreviewRef.current) {
+      toast.error("Erro ao acessar preview");
+      return;
+    }
+
+    toast.info("Iniciando exportação... Aguarde a animação completa.");
+    
+    // Resetar e iniciar animação
+    setIsPlaying(true);
+    setDisplayedMessages([]);
+
+    // Aguardar um frame para garantir que o reset foi aplicado
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const format: ExportFormat = {
+      name: "Instagram Story",
+      width: 1080,
+      height: 1920,
+      format: "webm",
+    };
+
+    // Simular progressão de mensagens para captura
+    for (let i = 0; i < conversation.messages.length; i++) {
+      setDisplayedMessages(prev => [...prev, conversation.messages[i]]);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+
+    // Aguardar frame final
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    await exportVideo(
+      chatPreviewRef.current,
+      conversation.messages,
+      format
+    );
+
+    setIsPlaying(false);
+    setDisplayedMessages(conversation.messages);
+  };
+
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
       {/* Chat Preview */}
-      <div className="flex-1 flex flex-col max-w-3xl mx-auto shadow-2xl">
+      <div 
+        ref={chatPreviewRef}
+        className="flex-1 flex flex-col max-w-3xl mx-auto shadow-2xl"
+      >
         <ChatHeader contact={conversation.contact} />
         <MessageList
           messages={isPlaying ? displayedMessages : conversation.messages}
@@ -86,7 +134,8 @@ const Index = () => {
         conversation={conversation}
         onUpdateConversation={handleUpdateConversation}
         onPlay={handlePlay}
-        isPlaying={isPlaying}
+        isPlaying={isPlaying || isExporting}
+        onExportVideo={handleExportVideo}
       />
     </div>
   );

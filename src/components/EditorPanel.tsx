@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Plus, Play, Download, Upload, FileJson, Settings, AlertTriangle } from "lucide-react";
+import { Plus, Play, Download, Upload, FileJson, Settings, AlertTriangle, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Conversation, Message } from "@/types/chat";
 import { MessageEditor } from "./MessageEditor";
 import { SettingsDialog } from "./SettingsDialog";
+import { ExportDialog } from "./ExportDialog";
 import { templates } from "@/utils/conversationTemplates";
 import { toast } from "sonner";
 import {
@@ -20,6 +21,7 @@ interface EditorPanelProps {
   onUpdateConversation: (conversation: Conversation) => void;
   onPlay: () => void;
   isPlaying: boolean;
+  onExportVideo: () => void;
 }
 
 export function EditorPanel({
@@ -27,8 +29,10 @@ export function EditorPanel({
   onUpdateConversation,
   onPlay,
   isPlaying,
+  onExportVideo,
 }: EditorPanelProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const handleAddMessage = () => {
     const newMessage: Message = {
@@ -180,25 +184,38 @@ export function EditorPanel({
           </Button>
         </div>
 
-        <div className="flex gap-2">
+        <div className="space-y-2">
           <Button
-            onClick={handleExport}
-            variant="outline"
+            onClick={() => setExportOpen(true)}
+            variant="default"
             size="sm"
-            className="flex-1"
+            className="w-full"
+            disabled={isPlaying}
           >
-            <Download className="h-4 w-4 mr-2" />
-            Exportar
+            <Video className="h-4 w-4 mr-2" />
+            Exportar Vídeo
           </Button>
-          <Button
-            onClick={handleImport}
-            variant="outline"
-            size="sm"
-            className="flex-1"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Importar
-          </Button>
+
+          <div className="flex gap-2">
+            <Button
+              onClick={handleExport}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              JSON
+            </Button>
+            <Button
+              onClick={handleImport}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              JSON
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -223,6 +240,16 @@ export function EditorPanel({
         onOpenChange={setSettingsOpen}
         conversation={conversation}
         onUpdateConversation={onUpdateConversation}
+      />
+
+      <ExportDialog
+        open={exportOpen}
+        onOpenChange={setExportOpen}
+        onStartExport={() => {
+          setExportOpen(false);
+          onExportVideo();
+        }}
+        isExporting={false}
       />
     </div>
   );
