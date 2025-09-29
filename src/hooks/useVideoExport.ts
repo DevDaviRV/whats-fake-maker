@@ -88,18 +88,27 @@ export function useVideoExport() {
               ctx.fillStyle = "#0a0a0a";
               ctx.fillRect(0, 0, canvas.width, canvas.height);
               
-              // Calcular escala para cobrir todo o canvas mantendo proporção
-              const scaleX = canvas.width / img.width;
-              const scaleY = canvas.height / img.height;
-              const scale = Math.max(scaleX, scaleY); // Usar max para cobrir completamente
+              // Adicionar padding (8% de cada lado)
+              const paddingPercent = 0.08;
+              const paddingX = canvas.width * paddingPercent;
+              const paddingY = canvas.height * paddingPercent;
+              
+              // Área disponível após padding
+              const availableWidth = canvas.width - (paddingX * 2);
+              const availableHeight = canvas.height - (paddingY * 2);
+              
+              // Calcular escala para caber na área disponível mantendo proporção
+              const scaleX = availableWidth / img.width;
+              const scaleY = availableHeight / img.height;
+              const scale = Math.min(scaleX, scaleY); // Usar min para caber completamente
               
               // Calcular dimensões finais
               const scaledWidth = img.width * scale;
               const scaledHeight = img.height * scale;
               
-              // Centralizar a imagem
-              const x = (canvas.width - scaledWidth) / 2;
-              const y = (canvas.height - scaledHeight) / 2;
+              // Centralizar a imagem na área disponível
+              const x = paddingX + (availableWidth - scaledWidth) / 2;
+              const y = paddingY + (availableHeight - scaledHeight) / 2;
               
               ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
               resolve();
