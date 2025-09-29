@@ -18,7 +18,7 @@ export function MessageList({ messages, animateMessages, showWatermark }: Messag
 
   return (
     <div 
-      className="flex-1 overflow-y-auto p-4 space-y-1 relative"
+      className="flex-1 overflow-y-auto p-2 space-y-1 relative"
       style={{
         backgroundImage: "url('/images/whatsapp-bg.png')",
         backgroundSize: "cover",
@@ -27,7 +27,7 @@ export function MessageList({ messages, animateMessages, showWatermark }: Messag
     >
       {showWatermark && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-          <div className="text-watermark/10 text-6xl font-bold rotate-[-25deg] select-none">
+          <div className="text-watermark/10 text-4xl font-bold rotate-[-25deg] select-none">
             SIMULADO
           </div>
         </div>
@@ -38,8 +38,8 @@ export function MessageList({ messages, animateMessages, showWatermark }: Messag
         return (
           <div key={message.id}>
             {separator && (
-              <div className="flex justify-center my-3">
-                <span className="bg-white/80 text-muted-foreground text-xs px-3 py-1 rounded-full shadow-sm">
+              <div className="flex justify-center my-2">
+                <span className="bg-white/80 text-muted-foreground text-[10px] px-2 py-0.5 rounded-full shadow-sm">
                   {separator}
                 </span>
               </div>

@@ -113,8 +113,8 @@ const Index = () => {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800">
       {/* Chat Preview with iPhone Mockup */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="relative w-full max-w-[400px] aspect-[9/19.5]">
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+        <div className="relative w-full max-w-[380px] aspect-[9/19.5]">
           {/* iPhone Mockup Frame */}
           <img 
             src={iphoneMockup} 
@@ -125,12 +125,12 @@ const Index = () => {
           {/* Chat Content - positioned inside the iPhone screen */}
           <div 
             ref={chatPreviewRef}
-            className="absolute inset-0 flex flex-col overflow-hidden"
+            className="absolute flex flex-col overflow-hidden bg-background"
             style={{
-              top: '2.5%',
-              left: '3.5%',
-              right: '3.5%',
-              bottom: '2.5%',
+              top: '3.8%',
+              left: '4.8%',
+              right: '4.8%',
+              bottom: '3.8%',
               borderRadius: '3rem',
             }}
           >
