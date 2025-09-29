@@ -38,9 +38,13 @@ export function useVideoExport() {
           ? "video/webm;codecs=vp9"
           : "video/webm";
         
+        // Configurar qualidade do canvas
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
         const mediaRecorder = new MediaRecorder(stream, {
           mimeType,
-          videoBitsPerSecond: 5000000,
+          videoBitsPerSecond: 10000000, // 10 Mbps para melhor qualidade
         });
 
         mediaRecorder.ondataavailable = (event) => {
@@ -71,27 +75,33 @@ export function useVideoExport() {
         const captureAndDraw = async () => {
           const dataUrl = await toPng(chatElement, {
             quality: 1,
-            pixelRatio: 1,
-            width: chatElement.offsetWidth,
-            height: chatElement.offsetHeight,
+            pixelRatio: 2, // Alta resolução
+            cacheBust: true,
+            width: chatElement.scrollWidth,
+            height: chatElement.scrollHeight,
           });
 
           return new Promise<void>((resolve) => {
             const img = new Image();
             img.onload = () => {
-              // Limpar canvas
+              // Limpar canvas com fundo preto
               ctx.fillStyle = "#0a0a0a";
               ctx.fillRect(0, 0, canvas.width, canvas.height);
               
-              // Calcular escala para caber no canvas
-              const scale = Math.min(
-                canvas.width / img.width,
-                canvas.height / img.height
-              );
-              const x = (canvas.width - img.width * scale) / 2;
-              const y = (canvas.height - img.height * scale) / 2;
+              // Calcular escala para cobrir todo o canvas mantendo proporção
+              const scaleX = canvas.width / img.width;
+              const scaleY = canvas.height / img.height;
+              const scale = Math.max(scaleX, scaleY); // Usar max para cobrir completamente
               
-              ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+              // Calcular dimensões finais
+              const scaledWidth = img.width * scale;
+              const scaledHeight = img.height * scale;
+              
+              // Centralizar a imagem
+              const x = (canvas.width - scaledWidth) / 2;
+              const y = (canvas.height - scaledHeight) / 2;
+              
+              ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
               resolve();
             };
             img.src = dataUrl;
