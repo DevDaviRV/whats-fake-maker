@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Conversation, Message } from "@/types/chat";
 import { MessageEditor } from "./MessageEditor";
 import { SettingsDialog } from "./SettingsDialog";
-import { ExportDialog } from "./ExportDialog";
+import { ExportDialog, ExportFormat } from "./ExportDialog";
 import { templates } from "@/utils/conversationTemplates";
 import { toast } from "sonner";
 import {
@@ -21,7 +21,7 @@ interface EditorPanelProps {
   onUpdateConversation: (conversation: Conversation) => void;
   onPlay: () => void;
   isPlaying: boolean;
-  onExportVideo: () => void;
+  onExportVideo: (format: ExportFormat) => void;
 }
 
 export function EditorPanel({
@@ -245,11 +245,8 @@ export function EditorPanel({
       <ExportDialog
         open={exportOpen}
         onOpenChange={setExportOpen}
-        onStartExport={() => {
-          setExportOpen(false);
-          onExportVideo();
-        }}
-        isExporting={false}
+        onStartExport={onExportVideo}
+        isExporting={isPlaying}
       />
     </div>
   );

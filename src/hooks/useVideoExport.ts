@@ -6,63 +6,21 @@ import { ExportFormat } from "@/components/ExportDialog";
 export function useVideoExport() {
   const [isExporting, setIsExporting] = useState(false);
 
-  const captureFrame = async (element: HTMLElement): Promise<string> => {
-    return await toPng(element, {
-      quality: 1,
-      pixelRatio: 2,
-    });
-  };
-
   const exportVideo = useCallback(
     async (
       chatElement: HTMLElement,
-      messages: any[],
-      format: ExportFormat,
-      onProgress?: (current: number, total: number) => void
+      animationCallback: () => Promise<void>,
+      format: ExportFormat
     ) => {
-      if (!chatElement || messages.length === 0) {
-        toast.error("Nenhuma mensagem para exportar");
+      if (!chatElement) {
+        toast.error("Elemento não encontrado");
         return;
       }
 
       setIsExporting(true);
-      const frames: string[] = [];
-      const fps = 30;
-      const messageDuration = 1.5; // segundos por mensagem
-      const framesPerMessage = Math.floor(fps * messageDuration);
 
       try {
-        toast.info("Iniciando captura de frames...");
-
-        // Capturar frame inicial (vazio)
-        for (let i = 0; i < fps; i++) {
-          const frame = await captureFrame(chatElement);
-          frames.push(frame);
-        }
-
-        // Capturar frames para cada mensagem
-        for (let i = 0; i < messages.length; i++) {
-          onProgress?.(i + 1, messages.length);
-          
-          // Aguardar mensagem aparecer
-          await new Promise((resolve) => setTimeout(resolve, 100));
-          
-          // Capturar frames dessa mensagem
-          for (let f = 0; f < framesPerMessage; f++) {
-            const frame = await captureFrame(chatElement);
-            frames.push(frame);
-          }
-        }
-
-        // Frame final (pause)
-        for (let i = 0; i < fps * 2; i++) {
-          const frame = await captureFrame(chatElement);
-          frames.push(frame);
-        }
-
-        toast.info("Processando vídeo...");
-
-        // Criar canvas para vídeo
+        // Criar canvas
         const canvas = document.createElement("canvas");
         canvas.width = format.width;
         canvas.height = format.height;
@@ -73,13 +31,17 @@ export function useVideoExport() {
         }
 
         // Configurar MediaRecorder
-        const stream = canvas.captureStream(fps);
-        const mediaRecorder = new MediaRecorder(stream, {
-          mimeType: "video/webm;codecs=vp9",
-          videoBitsPerSecond: 5000000, // 5 Mbps
-        });
-
+        const stream = canvas.captureStream(30);
         const chunks: Blob[] = [];
+        
+        const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+          ? "video/webm;codecs=vp9"
+          : "video/webm";
+        
+        const mediaRecorder = new MediaRecorder(stream, {
+          mimeType,
+          videoBitsPerSecond: 5000000,
+        });
 
         mediaRecorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
@@ -87,36 +49,41 @@ export function useVideoExport() {
           }
         };
 
-        await new Promise<void>((resolve, reject) => {
+        const recordingComplete = new Promise<void>((resolve) => {
           mediaRecorder.onstop = () => {
             const blob = new Blob(chunks, { type: "video/webm" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-            link.download = `whatsapp-${Date.now()}.webm`;
+            link.download = `whatsapp-conversa-${Date.now()}.webm`;
+            document.body.appendChild(link);
             link.click();
-            URL.revokeObjectURL(url);
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
             resolve();
           };
+        });
 
-          mediaRecorder.onerror = reject;
+        toast.info("Gravando vídeo...");
+        mediaRecorder.start();
 
-          mediaRecorder.start();
+        // Função para capturar e desenhar no canvas
+        const captureAndDraw = async () => {
+          const dataUrl = await toPng(chatElement, {
+            quality: 1,
+            pixelRatio: 1,
+            width: chatElement.offsetWidth,
+            height: chatElement.offsetHeight,
+          });
 
-          // Renderizar frames
-          let frameIndex = 0;
-          const renderFrame = () => {
-            if (frameIndex >= frames.length) {
-              mediaRecorder.stop();
-              return;
-            }
-
+          return new Promise<void>((resolve) => {
             const img = new Image();
             img.onload = () => {
-              ctx.fillStyle = "#ffffff";
+              // Limpar canvas
+              ctx.fillStyle = "#0a0a0a";
               ctx.fillRect(0, 0, canvas.width, canvas.height);
               
-              // Centralizar imagem mantendo proporção
+              // Calcular escala para caber no canvas
               const scale = Math.min(
                 canvas.width / img.width,
                 canvas.height / img.height
@@ -125,15 +92,24 @@ export function useVideoExport() {
               const y = (canvas.height - img.height * scale) / 2;
               
               ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-              
-              frameIndex++;
-              setTimeout(renderFrame, 1000 / fps);
+              resolve();
             };
-            img.src = frames[frameIndex];
-          };
+            img.src = dataUrl;
+          });
+        };
 
-          renderFrame();
-        });
+        // Executar animação com captura contínua
+        const captureInterval = setInterval(captureAndDraw, 33); // ~30fps
+
+        await animationCallback();
+
+        // Aguardar última captura
+        await captureAndDraw();
+        clearInterval(captureInterval);
+
+        // Parar gravação
+        mediaRecorder.stop();
+        await recordingComplete;
 
         toast.success("Vídeo exportado com sucesso!");
       } catch (error) {

@@ -88,6 +88,7 @@ export function ExportDialog({
     const format = exportFormats[selectedFormat];
     if (format) {
       onStartExport(format);
+      onOpenChange(false);
     }
   };
 

@@ -72,43 +72,39 @@ const Index = () => {
     }
   };
 
-  const handleExportVideo = async () => {
+  const handleExportVideo = async (format: ExportFormat) => {
     if (!chatPreviewRef.current) {
       toast.error("Erro ao acessar preview");
       return;
     }
 
-    toast.info("Iniciando exportação... Aguarde a animação completa.");
+    toast.info("Iniciando exportação...");
     
-    // Resetar e iniciar animação
+    // Resetar para estado inicial
     setIsPlaying(true);
     setDisplayedMessages([]);
 
-    // Aguardar um frame para garantir que o reset foi aplicado
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    const format: ExportFormat = {
-      name: "Instagram Story",
-      width: 1080,
-      height: 1920,
-      format: "webm",
+    // Função de animação que será executada durante a gravação
+    const runAnimation = async () => {
+      // Aguardar 1 segundo inicial
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Animar mensagens
+      for (let i = 0; i < conversation.messages.length; i++) {
+        setDisplayedMessages(prev => [...prev, conversation.messages[i]]);
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      }
+
+      // Pausa final
+      await new Promise(resolve => setTimeout(resolve, 2000));
     };
 
-    // Simular progressão de mensagens para captura
-    for (let i = 0; i < conversation.messages.length; i++) {
-      setDisplayedMessages(prev => [...prev, conversation.messages[i]]);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-    }
+    // Executar exportação
+    await exportVideo(chatPreviewRef.current, runAnimation, format);
 
-    // Aguardar frame final
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    await exportVideo(
-      chatPreviewRef.current,
-      conversation.messages,
-      format
-    );
-
+    // Resetar estado
     setIsPlaying(false);
     setDisplayedMessages(conversation.messages);
   };
