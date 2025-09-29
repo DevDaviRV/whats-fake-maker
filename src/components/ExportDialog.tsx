@@ -1,89 +1,72 @@
 import { useState } from "react";
 import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-
 interface ExportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onStartExport: (format: ExportFormat) => void;
   isExporting: boolean;
 }
-
 export interface ExportFormat {
   name: string;
   width: number;
   height: number;
   format: "webm" | "mp4";
 }
-
 const exportFormats: Record<string, ExportFormat> = {
   "instagram-story": {
     name: "Instagram Story (9:16)",
     width: 1080,
     height: 1920,
-    format: "webm",
+    format: "webm"
   },
   "instagram-post": {
     name: "Instagram Post (1:1)",
     width: 1080,
     height: 1080,
-    format: "webm",
+    format: "webm"
   },
   "tiktok": {
     name: "TikTok (9:16)",
     width: 1080,
     height: 1920,
-    format: "webm",
+    format: "webm"
   },
   "youtube-shorts": {
     name: "YouTube Shorts (9:16)",
     width: 1080,
     height: 1920,
-    format: "webm",
+    format: "webm"
   },
   "facebook-story": {
     name: "Facebook Story (9:16)",
     width: 1080,
     height: 1920,
-    format: "webm",
+    format: "webm"
   },
   "twitter": {
     name: "Twitter/X (16:9)",
     width: 1280,
     height: 720,
-    format: "webm",
+    format: "webm"
   },
   "custom": {
     name: "Personalizado (9:16)",
     width: 1080,
     height: 1920,
-    format: "webm",
-  },
+    format: "webm"
+  }
 };
-
 export function ExportDialog({
   open,
   onOpenChange,
   onStartExport,
-  isExporting,
+  isExporting
 }: ExportDialogProps) {
   const [selectedFormat, setSelectedFormat] = useState<string>("instagram-story");
-
   const handleExport = () => {
     const format = exportFormats[selectedFormat];
     if (format) {
@@ -91,9 +74,7 @@ export function ExportDialog({
       onOpenChange(false);
     }
   };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+  return <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Exportar Vídeo</DialogTitle>
@@ -110,22 +91,20 @@ export function ExportDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(exportFormats).map(([key, format]) => (
-                  <SelectItem key={key} value={key}>
+                {Object.entries(exportFormats).map(([key, format]) => <SelectItem key={key} value={key}>
                     {format.name}
-                  </SelectItem>
-                ))}
+                  </SelectItem>)}
               </SelectContent>
             </Select>
           </div>
 
           <div className="bg-muted rounded-lg p-3 space-y-1">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-slate-50">
               <strong>Resolução:</strong>{" "}
               {exportFormats[selectedFormat].width} x{" "}
               {exportFormats[selectedFormat].height}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-slate-50">
               <strong>Formato:</strong> {exportFormats[selectedFormat].format.toUpperCase()}
             </p>
           </div>
@@ -139,33 +118,19 @@ export function ExportDialog({
         </div>
 
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="flex-1"
-            disabled={isExporting}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1" disabled={isExporting}>
             Cancelar
           </Button>
-          <Button
-            onClick={handleExport}
-            className="flex-1"
-            disabled={isExporting}
-          >
-            {isExporting ? (
-              <>
+          <Button onClick={handleExport} className="flex-1" disabled={isExporting}>
+            {isExporting ? <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Exportando...
-              </>
-            ) : (
-              <>
+              </> : <>
                 <Download className="h-4 w-4 mr-2" />
                 Exportar
-              </>
-            )}
+              </>}
           </Button>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 }
