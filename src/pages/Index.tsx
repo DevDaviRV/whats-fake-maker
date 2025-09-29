@@ -125,13 +125,16 @@ const Index = () => {
           
           {/* Chat Content - positioned inside the iPhone screen */}
           <div 
-            className="absolute flex flex-col overflow-hidden bg-background"
+            className="absolute flex flex-col overflow-hidden"
             style={{
               top: '3.8%',
               left: '4.2%',
               right: '4.2%',
               bottom: '3.8%',
               borderRadius: '3rem',
+              backgroundImage: "url('/images/whatsapp-bg.png')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }}
           >
             <StatusBar />

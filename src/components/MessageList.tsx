@@ -19,14 +19,7 @@ export function MessageList({ messages, animateMessages, showWatermark }: Messag
 
   return (
     <ScrollArea className="flex-1">
-      <div 
-        className="p-2 space-y-1 relative min-h-full"
-        style={{
-          backgroundImage: "url('/images/whatsapp-bg.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
+      <div className="p-2 space-y-1 relative min-h-full">
         {showWatermark && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
             <div className="text-watermark/10 text-4xl font-bold rotate-[-25deg] select-none">
