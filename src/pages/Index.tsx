@@ -31,7 +31,7 @@ const initialConversation: Conversation = {
       status: "read",
     },
   ],
-  showWatermark: true,
+  showWatermark: false,
 };
 
 const Index = () => {
