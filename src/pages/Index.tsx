@@ -57,7 +57,14 @@ const Index = () => {
     let currentIndex = 0;
     const interval = setInterval(() => {
       if (currentIndex < conversation.messages.length) {
-        setDisplayedMessages((prev) => [...prev, conversation.messages[currentIndex]]);
+        // Adicionar nova mensagem e atualizar status das anteriores para "read"
+        setDisplayedMessages((prev) => {
+          const updatedPrev = prev.map(msg => ({
+            ...msg,
+            status: msg.sender === "own" ? "read" : msg.status
+          }));
+          return [...updatedPrev, conversation.messages[currentIndex]];
+        });
         currentIndex++;
       } else {
         clearInterval(interval);
@@ -95,7 +102,13 @@ const Index = () => {
 
       // Animar mensagens
       for (let i = 0; i < conversation.messages.length; i++) {
-        setDisplayedMessages(prev => [...prev, conversation.messages[i]]);
+        setDisplayedMessages(prev => {
+          const updatedPrev = prev.map(msg => ({
+            ...msg,
+            status: msg.sender === "own" ? "read" : msg.status
+          }));
+          return [...updatedPrev, conversation.messages[i]];
+        });
         await new Promise(resolve => setTimeout(resolve, 1500));
       }
 
