@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { ChatHeader } from "@/components/ChatHeader";
+import { StatusBar } from "@/components/StatusBar";
 import { MessageList } from "@/components/MessageList";
 import { ChatInput } from "@/components/ChatInput";
 import { EditorPanel } from "@/components/EditorPanel";
@@ -134,6 +135,7 @@ const Index = () => {
               borderRadius: '3rem',
             }}
           >
+            <StatusBar />
             <ChatHeader contact={conversation.contact} />
             <MessageList
               messages={isPlaying ? displayedMessages : conversation.messages}

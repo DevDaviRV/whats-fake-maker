@@ -8,7 +8,7 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ contact }: ChatHeaderProps) {
   return (
-    <header className="bg-header text-header-foreground px-3 pt-4 pb-3 flex items-center gap-2.5 shadow-md shrink-0">
+    <header className="bg-header text-header-foreground px-3 py-2.5 flex items-center gap-2.5 shadow-md shrink-0">
       <button className="hover:bg-white/10 p-1.5 rounded-full transition-colors">
         <ArrowLeft className="h-5 w-5" />
       </button>
