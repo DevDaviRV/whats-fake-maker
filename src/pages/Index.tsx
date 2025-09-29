@@ -7,6 +7,7 @@ import { Conversation } from "@/types/chat";
 import { useVideoExport } from "@/hooks/useVideoExport";
 import { ExportFormat } from "@/components/ExportDialog";
 import { toast } from "sonner";
+import iphoneMockup from "@/assets/iphone-mockup.png";
 
 const initialConversation: Conversation = {
   id: "1",
@@ -110,19 +111,38 @@ const Index = () => {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
-      {/* Chat Preview */}
-      <div 
-        ref={chatPreviewRef}
-        className="flex-1 flex flex-col max-w-3xl mx-auto shadow-2xl"
-      >
-        <ChatHeader contact={conversation.contact} />
-        <MessageList
-          messages={isPlaying ? displayedMessages : conversation.messages}
-          animateMessages={isPlaying}
-          showWatermark={conversation.showWatermark}
-        />
-        <ChatInput />
+    <div className="flex h-screen w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800">
+      {/* Chat Preview with iPhone Mockup */}
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="relative w-full max-w-[400px] aspect-[9/19.5]">
+          {/* iPhone Mockup Frame */}
+          <img 
+            src={iphoneMockup} 
+            alt="iPhone Frame" 
+            className="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none select-none"
+          />
+          
+          {/* Chat Content - positioned inside the iPhone screen */}
+          <div 
+            ref={chatPreviewRef}
+            className="absolute inset-0 flex flex-col overflow-hidden"
+            style={{
+              top: '2.5%',
+              left: '3.5%',
+              right: '3.5%',
+              bottom: '2.5%',
+              borderRadius: '3rem',
+            }}
+          >
+            <ChatHeader contact={conversation.contact} />
+            <MessageList
+              messages={isPlaying ? displayedMessages : conversation.messages}
+              animateMessages={isPlaying}
+              showWatermark={conversation.showWatermark}
+            />
+            <ChatInput />
+          </div>
+        </div>
       </div>
 
       {/* Editor Panel */}
