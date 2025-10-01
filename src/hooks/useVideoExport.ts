@@ -77,8 +77,8 @@ export function useVideoExport() {
             quality: 1,
             pixelRatio: 2, // Alta resolução
             cacheBust: true,
-            width: chatElement.scrollWidth,
-            height: chatElement.scrollHeight,
+            width: chatElement.offsetWidth,
+            height: chatElement.offsetHeight,
           });
 
           return new Promise<void>((resolve) => {

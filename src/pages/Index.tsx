@@ -109,7 +109,17 @@ const Index = () => {
           }));
           return [...updatedPrev, conversation.messages[i]];
         });
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Aguardar renderização
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Forçar scroll para o final
+        const scrollArea = chatPreviewRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+        if (scrollArea) {
+          scrollArea.scrollTop = scrollArea.scrollHeight;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 1400));
       }
 
       // Pausa final
